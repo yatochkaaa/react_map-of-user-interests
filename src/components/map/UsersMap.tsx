@@ -4,7 +4,11 @@ import type { LatLngBounds } from "leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import type { MultiValue } from "react-select";
 import UserMarker from "./UserMarker";
-import { iconCreateFunction } from "../../utils/donut";
+import {
+  handleClusterMouseOut,
+  handleClusterMouseOver,
+  iconCreateFunction,
+} from "../../utils/donut";
 import { map } from "../../constants";
 import type { User } from "../../types/user";
 import type { OptionType } from "../../types/select";
@@ -66,7 +70,13 @@ const UsersMap = ({ users, selectedInterests }: Props) => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <MapBoundsWatcher onBoundsChange={setBounds} bounds={bounds} />
-      <MarkerClusterGroup iconCreateFunction={iconCreateFunction}>
+      <MarkerClusterGroup
+        iconCreateFunction={iconCreateFunction}
+        eventHandlers={{
+          clustermouseover: handleClusterMouseOver,
+          clustermouseout: handleClusterMouseOut,
+        }}
+      >
         {filteredUsers.map((user) => (
           <UserMarker key={user._id} user={user} />
         ))}

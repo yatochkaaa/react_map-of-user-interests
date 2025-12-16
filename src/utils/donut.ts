@@ -1,7 +1,7 @@
-import L from "leaflet";
+import L, { MarkerCluster, type LeafletMouseEvent } from "leaflet";
 import type { UserMarker } from "../types/map";
 import type { User } from "../types/user";
-import { map } from "../constants";
+import { interestsList, map } from "../constants";
 import "leaflet.markercluster";
 
 function getInterestCounts(users: User[]) {
@@ -74,3 +74,44 @@ export function getMarkerRef(user: User) {
     }
   };
 }
+
+export const getClusterInterestsText = (cluster: L.MarkerCluster) => {
+  const markers = cluster.getAllChildMarkers() as UserMarker[];
+  const counts: Record<string, number> = {};
+
+  markers.forEach((m) => {
+    m.options.user.interests.forEach((i) => {
+      counts[i] = (counts[i] || 0) + 1;
+    });
+  });
+
+  const sortedEntries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+  return sortedEntries
+    .map(([i, c]) => {
+      const interest = interestsList.find((li) => li.id === i);
+      return `<div style="display:flex;align-items:center;">
+        <span style="width:10px;height:10px;background-color:${
+          interest?.color
+        };margin-right:4px;"></span>
+        ${interest?.label || i}: ${c}
+      </div>`;
+    })
+    .join("");
+};
+
+export const handleClusterMouseOver = (
+  e: LeafletMouseEvent & { propagatedFrom: MarkerCluster }
+) => {
+  const cluster = e.propagatedFrom;
+  const tooltipText = getClusterInterestsText(cluster);
+  cluster
+    .bindTooltip(tooltipText, { direction: "top", sticky: true })
+    .openTooltip();
+};
+
+export const handleClusterMouseOut = (
+  e: LeafletMouseEvent & { propagatedFrom: MarkerCluster }
+) => {
+  e.propagatedFrom.closeTooltip();
+};
