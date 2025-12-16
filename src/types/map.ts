@@ -10,8 +10,3 @@ export interface MapConstants {
 export interface UserMarker extends L.Marker {
   options: L.MarkerOptions & { user: User };
 }
-
-export interface InterestCount {
-  count: number;
-  color: string;
-}

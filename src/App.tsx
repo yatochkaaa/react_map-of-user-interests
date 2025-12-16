@@ -21,9 +21,11 @@ function App() {
   return (
     <>
       <SelectInput
-        options={interestsList.map(({ id, label }) => ({
+        options={interestsList.map(({ id, label, color, icon }) => ({
           value: id,
           label,
+          color,
+          icon,
         }))}
         selectedOptions={selectedInterests}
         setSelectedOptions={setSelectedInterests}

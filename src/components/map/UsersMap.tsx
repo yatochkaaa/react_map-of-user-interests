@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import { useMemo, useState } from "react";
+import { MapContainer, TileLayer } from "react-leaflet";
 import type { LatLngBounds } from "leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import type { MultiValue } from "react-select";
@@ -12,6 +12,7 @@ import {
 import { map } from "../../constants";
 import type { User } from "../../types/user";
 import type { OptionType } from "../../types/select";
+import MapBoundsWatcher from "./MapBoundsWatcher";
 
 interface Props {
   users: User[];
@@ -20,28 +21,6 @@ interface Props {
 
 const UsersMap = ({ users, selectedInterests }: Props) => {
   const [bounds, setBounds] = useState<LatLngBounds | null>(null);
-
-  const MapBoundsWatcher = ({
-    onBoundsChange,
-    bounds,
-  }: {
-    onBoundsChange: (bounds: LatLngBounds) => void;
-    bounds: LatLngBounds | null;
-  }) => {
-    const currentMap = useMapEvents({
-      moveend: (e) => onBoundsChange(e.target.getBounds()),
-      zoomend: (e) => onBoundsChange(e.target.getBounds()),
-    });
-
-    useEffect(() => {
-      const newBounds = currentMap.getBounds();
-      if (!bounds || !newBounds.equals(bounds)) {
-        onBoundsChange(newBounds);
-      }
-    }, [currentMap, onBoundsChange, bounds]);
-
-    return null;
-  };
 
   const filteredUsers = useMemo(() => {
     if (!bounds) return [];
