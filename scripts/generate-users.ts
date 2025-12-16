@@ -4,7 +4,7 @@ import path from "path";
 
 const outputPath = path.join(process.cwd(), "public", "users.json");
 
-const users = Array.from({ length: 500 }, () => ({
+const users = Array.from({ length: 10000 }, () => ({
   _id: faker.string.uuid(),
   lat: faker.location.latitude(),
   lon: faker.location.longitude(),

@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import "./App.css";
+import { MapContainer, TileLayer } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-markercluster";
 import type { User } from "./types/user";
 import { map } from "./constants";
+import { iconCreateFunction } from "./utils/donut";
+import { getUsers } from "./api/users";
+import UserMarker from "./components/UserMarker";
+import "./App.css";
 
 function App() {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    fetch("/users.json")
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
+    getUsers().then((data) => setUsers(data));
   }, []);
 
   return (
@@ -25,14 +26,11 @@ function App() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {users.map((user) => (
-          <Marker position={[user.lat, user.lon]} key={user.id}>
-            <Popup>
-              <strong>{user.fullName}</strong>
-              <div>Interests: {user.interests.join(", ")}</div>
-            </Popup>
-          </Marker>
-        ))}
+        <MarkerClusterGroup iconCreateFunction={iconCreateFunction}>
+          {users.map((user) => (
+            <UserMarker key={user.id} user={user} />
+          ))}
+        </MarkerClusterGroup>
       </MapContainer>
     </>
   );
