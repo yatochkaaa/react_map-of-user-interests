@@ -18,7 +18,7 @@ git clone https://github.com/yatochkaaa/react_map-of-user-interests.git
 cd react_map-of-user-interests
 ```
 
-№# Install dependencies
+## Install dependencies
 ```bash
 npm install
 ```
