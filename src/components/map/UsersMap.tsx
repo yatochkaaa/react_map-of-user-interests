@@ -1,4 +1,6 @@
-import { MapContainer, TileLayer } from "react-leaflet";
+import { useEffect, useMemo, useState } from "react";
+import { MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import type { LatLngBounds } from "leaflet";
 import MarkerClusterGroup from "react-leaflet-markercluster";
 import type { MultiValue } from "react-select";
 import UserMarker from "./UserMarker";
@@ -13,12 +15,45 @@ interface Props {
 }
 
 const UsersMap = ({ users, selectedInterests }: Props) => {
-  const filteredUsers = users.filter((u) => {
-    if (selectedInterests.length === 0) return true;
-    return u.interests.some((ui) =>
-      selectedInterests.some((si) => si.value === ui)
-    );
-  });
+  const [bounds, setBounds] = useState<LatLngBounds | null>(null);
+
+  const MapBoundsWatcher = ({
+    onBoundsChange,
+    bounds,
+  }: {
+    onBoundsChange: (bounds: LatLngBounds) => void;
+    bounds: LatLngBounds | null;
+  }) => {
+    const currentMap = useMapEvents({
+      moveend: (e) => onBoundsChange(e.target.getBounds()),
+      zoomend: (e) => onBoundsChange(e.target.getBounds()),
+    });
+
+    useEffect(() => {
+      const newBounds = currentMap.getBounds();
+      if (!bounds || !newBounds.equals(bounds)) {
+        onBoundsChange(newBounds);
+      }
+    }, [currentMap, onBoundsChange, bounds]);
+
+    return null;
+  };
+
+  const filteredUsers = useMemo(() => {
+    if (!bounds) return [];
+
+    const interestsSet = new Set(selectedInterests.map((i) => i.value));
+
+    return users.filter((u) => {
+      const inBounds = bounds.contains([u.lat, u.lon]);
+
+      if (!inBounds) return false;
+
+      if (!interestsSet.size) return true;
+
+      return u.interests.some((ui) => interestsSet.has(ui));
+    });
+  }, [users, selectedInterests, bounds]);
 
   return (
     <MapContainer
@@ -30,6 +65,7 @@ const UsersMap = ({ users, selectedInterests }: Props) => {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
+      <MapBoundsWatcher onBoundsChange={setBounds} bounds={bounds} />
       <MarkerClusterGroup iconCreateFunction={iconCreateFunction}>
         {filteredUsers.map((user) => (
           <UserMarker key={user._id} user={user} />
