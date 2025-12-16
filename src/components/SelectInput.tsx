@@ -1,5 +1,5 @@
 import Select, { type ActionMeta, type MultiValue } from "react-select";
-import type { OptionType } from "../types/ui";
+import type { OptionType } from "../types/select";
 
 interface Props {
   options: OptionType[];

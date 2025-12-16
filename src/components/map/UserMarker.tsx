@@ -1,6 +1,6 @@
 import { Marker, Popup } from "react-leaflet";
-import { getMarkerRef } from "../utils/donut";
-import type { User } from "../types/user";
+import { getMarkerRef } from "../../utils/donut";
+import type { User } from "../../types/user";
 
 interface Props {
   user: User;
@@ -8,10 +8,7 @@ interface Props {
 
 const UserMarker = ({ user }: Props) => {
   return (
-    <Marker
-      position={[user.lat, user.lon]}
-      ref={getMarkerRef(user)}
-    >
+    <Marker position={[user.lat, user.lon]} ref={getMarkerRef(user)}>
       <Popup>
         <strong>{user.fullName}</strong>
         <div>Interests: {user.interests.join(", ")}</div>
