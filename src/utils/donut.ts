@@ -1,8 +1,8 @@
 import L from "leaflet";
-import "leaflet.markercluster";
 import type { UserMarker } from "../types/map";
 import type { User } from "../types/user";
 import { map } from "../constants";
+import "leaflet.markercluster";
 
 function getInterestCounts(users: User[]) {
   const counts: Record<string, number> = {};

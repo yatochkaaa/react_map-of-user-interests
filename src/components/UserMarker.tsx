@@ -9,7 +9,6 @@ interface Props {
 const UserMarker = ({ user }: Props) => {
   return (
     <Marker
-      key={user.id}
       position={[user.lat, user.lon]}
       ref={getMarkerRef(user)}
     >

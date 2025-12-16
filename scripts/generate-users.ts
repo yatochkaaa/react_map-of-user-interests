@@ -1,6 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { writeFileSync, mkdirSync } from "fs";
 import path from "path";
+import { interestsList } from "../src/constants.ts";
 
 const outputPath = path.join(process.cwd(), "public", "users.json");
 
@@ -10,18 +11,7 @@ const users = Array.from({ length: 10000 }, () => ({
   lon: faker.location.longitude(),
   fullName: faker.person.fullName(),
   interests: faker.helpers.arrayElements(
-    [
-      "hiking",
-      "cooking",
-      "traveling",
-      "reading",
-      "gaming",
-      "music",
-      "sports",
-      "photography",
-      "art",
-      "technology",
-    ],
+    interestsList.map((i) => i.id),
     { min: 1, max: 4 }
   ),
 }));
