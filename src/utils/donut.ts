@@ -6,31 +6,40 @@ import "leaflet.markercluster";
 
 function getInterestCounts(users: User[]) {
   const counts: Record<string, number> = {};
-  users.forEach((user) =>
-    user.interests.forEach((i) => (counts[i] = (counts[i] || 0) + 1))
-  );
-  return counts;
+  let totalSlices = 0;
+
+  users.forEach((user) => {
+    user.interests.forEach((i) => {
+      counts[i] = (counts[i] || 0) + 1;
+      totalSlices++;
+    });
+  });
+
+  return { counts, totalSlices };
 }
 
 export function createDonutClusterIcon(usersInCluster: User[]) {
-  const counts = getInterestCounts(usersInCluster);
-  const total = usersInCluster.length;
-
+  const { counts, totalSlices } = getInterestCounts(usersInCluster);
   let offset = 0;
+  const outerR = 50;
+  const innerR = 25;
+
   const slices = Object.entries(counts)
     .map(([interest, count]) => {
-      const angle = (count / total) * 360;
+      const angle = (count / totalSlices) * 360;
+      if (angle === 0) return "";
+
       const start = offset;
       const end = offset + angle;
       offset += angle;
 
-      const x1 = 50 + 50 * Math.sin((start * Math.PI) / 180);
-      const y1 = 50 - 50 * Math.cos((start * Math.PI) / 180);
-      const x2 = 50 + 50 * Math.sin((end * Math.PI) / 180);
-      const y2 = 50 - 50 * Math.cos((end * Math.PI) / 180);
+      const x1 = 50 + outerR * Math.sin((start * Math.PI) / 180);
+      const y1 = 50 - outerR * Math.cos((start * Math.PI) / 180);
+      const x2 = 50 + outerR * Math.sin((end * Math.PI) / 180);
+      const y2 = 50 - outerR * Math.cos((end * Math.PI) / 180);
       const largeArc = angle > 180 ? 1 : 0;
 
-      return `<path d="M50,50 L${x1},${y1} A50,50 0 ${largeArc},1 ${x2},${y2} Z" fill="${
+      return `<path d="M50,50 L${x1},${y1} A${outerR},${outerR} 0 ${largeArc},1 ${x2},${y2} Z" fill="${
         map.INTEREST_COLORS[interest] || "#ccc"
       }"></path>`;
     })
@@ -39,8 +48,8 @@ export function createDonutClusterIcon(usersInCluster: User[]) {
   const html = `
     <svg width="50" height="50" viewBox="0 0 100 100">
       ${slices}
-      <circle cx="50" cy="50" r="25" fill="white"/>
-      <text x="50" y="55" font-size="20" text-anchor="middle" fill="#000">${total}</text>
+      <circle cx="50" cy="50" r="${innerR}" fill="white"/>
+      <text x="50" y="55" font-size="20" text-anchor="middle" fill="#000">${usersInCluster.length}</text>
     </svg>
   `;
 
